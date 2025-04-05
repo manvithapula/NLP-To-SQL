@@ -1,0 +1,39 @@
+The WikiSQL dataset contains natural language questions and corresponding SQL queries, used to train models that translate human language into database queries. Data cleaning ensures consistency and reliability.
+Dataset Loading
+
+We used the load_dataset("wikisql") function from Hugging Face's datasets library. The dataset was automatically split into:
+Train: 56,355 samples
+Validation: 8,421 samples
+Test: 15,878 samples
+
+Text Normalization
+
+To ensure consistent input formatting for the model, the following text cleaning operations were performed on the natural language questions:
+Lowercasing: To eliminate case-sensitive discrepancies, all text was converted to lowercase using the text.lower() method.
+Removing Special Characters: Punctuation marks, symbols, and other non-alphanumeric characters were removed through the regular expression re.sub(r'[^a-z0-9\s]', '', text), preserving only lowercase letters, numbers, and spaces.
+Whitespace Normalization: Excess whitespace was cleaned by collapsing multiple spaces into a single space and trimming any leading or trailing whitespace using re.sub(r'\s+', ' ', text).strip().
+
+
+
+Handling Missing Values
+
+To ensure the dataset was complete and reliable for downstream tasks, missing values were handled as follows:
+Detection: The presence of missing values across all columns was checked using df.isnull().sum(), which confirmed that some entries may be incomplete.
+Removal: Rows with missing values in either the question or sql columns were dropped using df.dropna(subset=['question', 'sql']), as these fields are critical for training the model.
+Result: After this step, the dataset contained 1,000 valid entries, with all missing values successfully removed.
+
+
+
+Tokenizer Initialization
+
+To prepare textual data for model training, a tokenizer is essential. In this step:
+The transformers library was installed and imported.
+A pre-trained T5 tokenizer (t5-small) was loaded using T5Tokenizer.from_pretrained("t5-small").
+Necessary files like tokenizer.json, spiece.model, and tokenizer_config.json were downloaded automatically, indicating successful setup.
+
+Tokenization Process(T5)
+
+We used the T5 tokenizer to convert the constructed text into token IDs. Key steps included:
+Padding: Ensures uniform length across batches.
+Truncation: Limits sequences to a max token length (128).
+Output: Token IDs and attention masks.
